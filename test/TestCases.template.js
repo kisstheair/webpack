@@ -1,18 +1,18 @@
-/* global describe it expect */
+/* global describe it beforeAll expect */
 "use strict";
 
 const path = require("path");
 const fs = require("fs");
 const vm = require("vm");
 const mkdirp = require("mkdirp");
-const TerserPlugin = require("terser-webpack-plugin");
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const checkArrayExpectation = require("./checkArrayExpectation");
 const createLazyTestEnv = require("./helpers/createLazyTestEnv");
 
 const Stats = require("../lib/Stats");
 const webpack = require("../lib/webpack");
 
-const terserForTesting = new TerserPlugin({
+const uglifyJsForTesting = new UglifyJsPlugin({
 	cache: false,
 	parallel: false,
 	sourceMap: true
@@ -31,12 +31,12 @@ const DEFAULT_OPTIMIZATIONS = {
 	concatenateModules: false,
 	namedModules: false,
 	hashedModuleIds: false,
-	minimizer: [terserForTesting]
+	minimizer: [uglifyJsForTesting]
 };
 
 const NO_EMIT_ON_ERRORS_OPTIMIZATIONS = {
 	noEmitOnErrors: false,
-	minimizer: [terserForTesting]
+	minimizer: [uglifyJsForTesting]
 };
 
 const casesPath = path.join(__dirname, "cases");

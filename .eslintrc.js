@@ -23,7 +23,7 @@ module.exports = {
 		yoda: "error",
 		eqeqeq: "error",
 		"global-require": "off",
-		"brace-style": "off",
+		"brace-style": "error",
 		"eol-last": "error",
 		"no-extra-bind": "warn",
 		"no-process-exit": "warn",

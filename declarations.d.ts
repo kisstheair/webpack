@@ -77,13 +77,6 @@ declare module "neo-async" {
 		callback?: ErrorCallback<E>
 	): void;
 
-	export function eachLimit<T, E>(
-		arr: IterableCollection<T>,
-		limit: number,
-		iterator: AsyncIterator<T, E>,
-		callback?: ErrorCallback<E>
-	): void;
-
 	export function map<T, R, E>(
 		arr: T[] | IterableIterator<T>,
 		iterator: AsyncResultIterator<T, R, E>,
@@ -105,7 +98,6 @@ declare module "neo-async" {
 	): void;
 
 	export const forEach: typeof each;
-	export const forEachLimit: typeof eachLimit;
 }
 
 // There are no typings for @webassemblyjs/ast
@@ -192,7 +184,7 @@ declare module "@webassemblyjs/ast" {
 	export function global(globalType: string, nodes: Node[]): Global;
 	export function identifier(indentifier: string): Identifier;
 	export function funcParam(valType: string, id: Identifier): FuncParam;
-	export function instruction(inst: string, args?: Node[]): Instruction;
+	export function instruction(inst: string, args: Node[]): Instruction;
 	export function callInstruction(funcIndex: Index): CallInstruction;
 	export function objectInstruction(
 		kind: string,
@@ -227,15 +219,6 @@ declare module "@webassemblyjs/ast" {
 	export function isMemory(n: Node): boolean;
 	export function isFuncImportDescr(n: Node): boolean;
 }
-
-// This "hack" is needed because typescript doesn't support recursive type definitions
-// It's referenced from "ruleSet-conditions" in schemas/WebpackOptions.json
-interface RuleSetConditionsRecursive
-	extends Array<import("./declarations/WebpackOptions").RuleSetCondition> {}
-interface RuleSetConditionsAbsoluteRecursive
-	extends Array<
-		import("./declarations/WebpackOptions").RuleSetConditionAbsolute
-	> {}
 
 /**
  * Global variable declarations

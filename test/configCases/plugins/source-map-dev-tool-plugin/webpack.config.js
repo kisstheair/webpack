@@ -1,5 +1,5 @@
 var webpack = require("../../../../");
-var TerserPlugin = require("terser-webpack-plugin");
+var UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 module.exports = {
 	node: {
 		__dirname: false,
@@ -14,7 +14,7 @@ module.exports = {
 	},
 	optimization: {
 		minimizer: [
-			new TerserPlugin({
+			new UglifyJsPlugin({
 				sourceMap: true
 			})
 		]

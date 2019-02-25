@@ -8,7 +8,6 @@ const WebpackOptionsDefaulter = require("../lib/WebpackOptionsDefaulter");
 const MemoryFs = require("memory-fs");
 
 describe("Compiler", () => {
-	jest.setTimeout(20000);
 	function compile(entry, options, callback) {
 		const noOutputPath = !options.output || !options.output.path;
 		if (!options.mode) options.mode = "production";
@@ -449,28 +448,6 @@ describe("Compiler", () => {
 			});
 		});
 	});
-	it("should flag watchMode as true in watch", function(done) {
-		const compiler = webpack({
-			context: __dirname,
-			mode: "production",
-			entry: "./c",
-			output: {
-				path: "/",
-				filename: "bundle.js"
-			}
-		});
-
-		compiler.outputFileSystem = new MemoryFs();
-
-		const watch = compiler.watch({}, err => {
-			if (err) return done(err);
-			expect(compiler.watchMode).toBeTruthy();
-			watch.close(() => {
-				expect(compiler.watchMode).toBeFalsy();
-				done();
-			});
-		});
-	});
 	it("should use cache on second run call", function(done) {
 		const compiler = webpack({
 			context: __dirname,
@@ -491,27 +468,6 @@ describe("Compiler", () => {
 				expect(result).toContain("module.exports = 0;");
 				done();
 			});
-		});
-	});
-	it("should call the failed-hook on error", done => {
-		const failedSpy = jest.fn();
-		const compiler = webpack({
-			bail: true,
-			context: __dirname,
-			mode: "production",
-			entry: "./missing",
-			output: {
-				path: "/",
-				filename: "bundle.js"
-			}
-		});
-		compiler.hooks.failed.tap("CompilerTest", failedSpy);
-		compiler.outputFileSystem = new MemoryFs();
-		compiler.run((err, stats) => {
-			expect(err).toBeTruthy();
-			expect(failedSpy).toHaveBeenCalledTimes(1);
-			expect(failedSpy).toHaveBeenCalledWith(err);
-			done();
 		});
 	});
 });

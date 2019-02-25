@@ -4,9 +4,9 @@ jobs:
       vmImage: ubuntu-16.04
     steps:
       - task: NodeTool@0
+        displayName: "Install Node.js"
         inputs:
           versionSpec: "^10.10.0"
-        displayName: "Install Node.js"
       - script: |
           curl -o- -L https://yarnpkg.com/install.sh | bash
         displayName: "Install Yarn"
@@ -26,32 +26,17 @@ jobs:
       - script: |
           set -e
           export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-          export JEST_JUNIT_OUTPUT=./basic-junit.xml
-          yarn test:basic --ci --reporters=jest-junit
-          export JEST_JUNIT_OUTPUT=./unit-junit.xml
-          yarn test:unit --ci --reporters=jest-junit
+          yarn test:basic --ci
+          yarn test:unit --ci
         displayName: "Run basic tests"
-      - task: PublishTestResults@2
-        inputs:
-          testRunTitle: "basic"
-          testResultsFiles: "**/basic-junit.xml"
-        condition: succeededOrFailed()
-        displayName: "Publish basic test results"
-      - task: PublishTestResults@2
-        inputs:
-          testRunTitle: "unit"
-          testResultsFiles: "**/unit-junit.xml"
-        condition: succeededOrFailed()
-        displayName: "Publish unit test results"
-
   - job: lint
     pool:
       vmImage: ubuntu-16.04
     steps:
       - task: NodeTool@0
+        displayName: "Install Node.js"
         inputs:
           versionSpec: "^10.10.0"
-        displayName: "Install Node.js"
       - script: |
           curl -o- -L https://yarnpkg.com/install.sh | bash
         displayName: "Install Yarn"
@@ -71,19 +56,9 @@ jobs:
       - script: |
           set -e
           export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-          yarn -s run code-lint --format junit > junit.xml
-          yarn jest-lint
-          yarn type-lint
-          yarn special-lint
+          yarn lint
         displayName: "Run linting"
-      - task: PublishTestResults@2
-        inputs:
-          testRunTitle: "lint"
-          testResultsFiles: "**/junit.xml"
-        condition: succeededOrFailed()
-        displayName: "Publish lint results"
-
-  - job: Linux
+  - job: linux
     dependsOn:
       - basic
       - lint
@@ -100,9 +75,9 @@ jobs:
           node_version: ^6.14.4
     steps:
       - task: NodeTool@0
+        displayName: "Install Node.js"
         inputs:
           versionSpec: $(node_version)
-        displayName: "Install Node.js $(node_version)"
       - script: |
           curl -o- -L https://yarnpkg.com/install.sh | bash
         displayName: "Install Yarn"
@@ -123,16 +98,14 @@ jobs:
           set -e
           export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
           yarn cover:init
-          yarn cover:integration --ci --maxWorkers=2 --reporters=jest-junit
+          yarn cover:integration "test/(?!TestCases)" --ci --maxWorkers=2
+          mv coverage/coverage-final.json coverage/coverage-final-1.json
+          yarn cover:integration "test/TestCasesD" --ci --maxWorkers=2
+          mv coverage/coverage-final.json coverage/coverage-final-2.json
+          yarn cover:integration "test/TestCases(?!D)" --ci --maxWorkers=2
+          mv coverage/coverage-final.json coverage/coverage-final-3.json
         displayName: "Run tests with coverage"
-      - task: PublishTestResults@2
-        inputs:
-          testRunTitle: "Linux with Node.js $(node_version)"
-          testResultsFiles: "**/junit.xml"
-        condition: succeededOrFailed()
-        displayName: "Publish test results"
-
-  - job: macOS
+  - job: macos
     dependsOn:
       - basic
       - lint
@@ -149,9 +122,9 @@ jobs:
           node_version: ^6.14.4
     steps:
       - task: NodeTool@0
+        displayName: "Install Node.js"
         inputs:
           versionSpec: $(node_version)
-        displayName: "Install Node.js $(node_version)"
       - script: |
           curl -o- -L https://yarnpkg.com/install.sh | bash
         displayName: "Install Yarn"
@@ -172,16 +145,14 @@ jobs:
           set -e
           export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
           yarn cover:init
-          yarn cover:integration --ci --reporters=jest-junit
+          yarn cover:integration "test/(?!TestCases)" --ci
+          mv coverage/coverage-final.json coverage/coverage-final-1.json
+          yarn cover:integration "test/TestCasesD" --ci
+          mv coverage/coverage-final.json coverage/coverage-final-2.json
+          yarn cover:integration "test/TestCases(?!D)" --ci
+          mv coverage/coverage-final.json coverage/coverage-final-3.json
         displayName: "Run tests with coverage"
-      - task: PublishTestResults@2
-        inputs:
-          testRunTitle: "macOS with Node.js $(node_version)"
-          testResultsFiles: "**/junit.xml"
-        condition: succeededOrFailed()
-        displayName: "Publish test results"
-
-  - job: Windows
+  - job: windows
     dependsOn:
       - basic
       - lint
@@ -198,27 +169,24 @@ jobs:
           node_version: ^6.14.4
     steps:
       - task: NodeTool@0
+        displayName: "Install Node.js"
         inputs:
           versionSpec: $(node_version)
-        displayName: "Install Node.js $(node_version)"
       - script: |
           npm install --global yarn
         displayName: "Install Yarn"
       - script: |
+          set -e
           node -v
           yarn -v
         displayName: "Print versions"
       - script: |
+          set -e
           yarn --frozen-lockfile
           yarn link --frozen-lockfile || true
           yarn link webpack --frozen-lockfile
         displayName: "Install dependencies"
       - script: |
-          yarn cover:init && yarn cover:integration --ci --maxWorkers=2 --reporters=jest-junit
+          set -e
+          yarn cover:init && yarn cover:integration "test/(?!TestCases)" --ci --maxWorkers=2 && move coverage\\coverage-final.json coverage\\coverage-final-1.json && yarn cover:integration "test/TestCasesD" --ci --maxWorkers=2 && move coverage\\coverage-final.json coverage\\coverage-final-2.json && yarn cover:integration "test/TestCases(?!D)" --ci --maxWorkers=2 && move coverage\\coverage-final.json coverage\\coverage-final-3.json
         displayName: "Run tests with coverage"
-      - task: PublishTestResults@2
-        inputs:
-          testRunTitle: "Windows with Node.js $(node_version)"
-          testResultsFiles: "**/junit.xml"
-        condition: succeededOrFailed()
-        displayName: "Publish test results"

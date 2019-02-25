@@ -18,8 +18,8 @@ coverage:
         target: 0%
     patch:
       default: off
-      basic:
-        flags: basic
+      integration:
+        flags: integration
         target: 90%
         base: pr
       integration:

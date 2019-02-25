@@ -1,6 +1,6 @@
 "use strict";
 
-/* globals expect */
+/* globals expect fit */
 const path = require("path");
 const fs = require("fs");
 const vm = require("vm");

@@ -1,4 +1,4 @@
-/* globals describe it beforeEach */
+/* globals describe, it, beforeEach, afterEach */
 "use strict";
 
 const NormalModule = require("../lib/NormalModule");

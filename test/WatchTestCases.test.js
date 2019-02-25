@@ -1,4 +1,4 @@
-/* global beforeAll expect */
+/* global beforeAll expect fit */
 "use strict";
 
 const path = require("path");

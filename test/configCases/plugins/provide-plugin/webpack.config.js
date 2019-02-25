@@ -10,8 +10,7 @@ module.exports = {
 			es2015_name: ["./harmony", "default"],
 			es2015_alias: ["./harmony", "alias"],
 			es2015_year: ["./harmony", "year"],
-			"this.aaa": "./aaa",
-			esm: "fail"
+			"this.aaa": "./aaa"
 		})
 	]
 };

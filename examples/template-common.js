@@ -20,12 +20,11 @@ const hashRegexp = /Hash: [a-f0-9]+/g;
 
 exports.replaceBase = (template) => {
 
-	const cwd = process.cwd();
+	let cwd = process.cwd();
 	let webpack = path.join(__dirname, "..");
 	let webpackParent = path.join(__dirname, "..", "..");
-	const cwdRegExpStr = lessStrict(cwd.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"));
-	const cwdRegExp = new RegExp(cwdRegExpStr, "g");
-	const cwdSlashRegExp = new RegExp(cwdRegExpStr + "[\\/\\\\]", "g");
+	cwd = lessStrict(cwd.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"));
+	cwd = new RegExp(cwd, "g");
 	webpack = lessStrict(webpack.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"));
 	webpack = new RegExp(webpack, "g");
 	webpackParent = lessStrict(webpackParent.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"));
@@ -34,8 +33,7 @@ exports.replaceBase = (template) => {
 	return template
 		.replace(/\r\n/g, "\n")
 		.replace(/\r/g, "\n")
-		.replace(cwdSlashRegExp, "./")
-		.replace(cwdRegExp, ".")
+		.replace(cwd, ".")
 		.replace(webpack, "(webpack)")
 		.replace(webpackParent, "(webpack)/~")
 		.replace(timeRegexp, "")
